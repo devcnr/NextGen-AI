@@ -18,7 +18,6 @@ async function sendMessage() {
 }
 
 function toggleEmoji() {
-    // Eğer zaten emoji picker varsa kaldır
     const existingPicker = document.querySelector('.emoji-picker');
     if (existingPicker) {
         existingPicker.remove();
@@ -28,7 +27,6 @@ function toggleEmoji() {
     const emojiPicker = document.createElement('div');
     emojiPicker.className = 'emoji-picker';
 
-    // Daha geniş emoji listesi
     const emojis = [
         '😀', '😃', '😄', '😁', '😆',
         '😅', '🤣', '😂', '🙂', '🙃',
@@ -50,11 +48,9 @@ function toggleEmoji() {
 
     emojiPicker.appendChild(emojiGrid);
 
-    // Input alanının yanına emoji picker'ı ekle
     const inputArea = document.querySelector('.input-area');
     inputArea.appendChild(emojiPicker);
 
-    // Dışarı tıklandığında emoji picker'ı kapat
     function closeEmojiPicker(e) {
         if (!emojiPicker.contains(e.target) &&
             !e.target.closest('.action-btn')) {
@@ -63,7 +59,6 @@ function toggleEmoji() {
         }
     }
 
-    // Kısa bir süre sonra event listener'ı ekle
     setTimeout(() => {
         document.addEventListener('click', closeEmojiPicker);
     }, 0);
@@ -72,10 +67,8 @@ function toggleEmoji() {
 function insertEmoji(emoji) {
     const input = document.querySelector('.input-field');
 
-    // Emoji'yi input alanına ekle
     input.value += emoji;
 
-    // Input alanına odaklan
     input.focus();
 }
 
@@ -95,7 +88,6 @@ state = {
     currentUtterance: null
 };
 
-// Sesli okuma toggle fonksiyonu
 function toggleAutoRead() {
     const button = document.querySelector('.action-btn i.fa-volume-up');
     state.isAutoReadActive = !state.isAutoReadActive;
@@ -103,7 +95,6 @@ function toggleAutoRead() {
     if (state.isAutoReadActive) {
         button.style.color = 'var(--primary-color)';
         showNotification('Sesli okuma aktif', 'success');
-        // Mevcut mesajı okumaya başla
         const lastMessage = document.querySelector('.message-bot:last-child');
         if (lastMessage) {
             readMessage(lastMessage.textContent);
@@ -111,29 +102,22 @@ function toggleAutoRead() {
     } else {
         button.style.color = '';
         showNotification('Sesli okuma devre dışı', 'warning');
-        // Mevcut okumayı durdur
         stopReading();
     }
 }
 
-// Mesaj okuma fonksiyonu
 function readMessage(text) {
-    // Eğer sesli okuma aktif değilse çık
     if (!state.isAutoReadActive) return;
 
-    // Eğer zaten okuma yapılıyorsa durdur
     stopReading();
 
-    // HTML etiketlerini temizle
     const cleanText = text.replace(/<[^>]*>/g, '');
 
-    // Yeni okuma oluştur
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'tr-TR';
-    utterance.rate = 1; // Normal hız
-    utterance.pitch = 1; // Normal ton
+    utterance.rate = 1; 
+    utterance.pitch = 1;
 
-    // Hata durumunu yakala
     utterance.onerror = (event) => {
         console.error('Sesli okuma hatası:', event.error);
         showNotification('Sesli okuma sırasında hata oluştu', 'error');
@@ -142,32 +126,27 @@ function readMessage(text) {
         button.style.color = '';
     };
 
-    // Okumayı başlat
     state.currentUtterance = utterance;
     state.speechSynthesis.speak(utterance);
 }
 
-// Okumayı durdurma fonksiyonu
 function stopReading() {
     if (state.speechSynthesis) {
         state.speechSynthesis.cancel();
     }
 }
 
-// addMessage fonksiyonunu güncelle
 const originalAddMessage = addMessage;
 addMessage = function (type, content) {
     originalAddMessage(type, content);
 
-    // Eğer bot mesajıysa ve sesli okuma aktifse oku
     if (type === 'bot' && state.isAutoReadActive) {
         readMessage(content);
     }
 };
 
-// Sayfa yüklendiğinde sesleri yükle
 document.addEventListener('DOMContentLoaded', () => {
-    // Sayfa yenilendiğinde sesli okumayı sıfırla
+
     state.isAutoReadActive = false;
     const button = document.querySelector('.action-btn i.fa-volume-up');
     if (button) {
@@ -255,10 +234,8 @@ function loadSavedChat(chatId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadChatList(); // Sayfa yüklendiğinde sohbet listesini yükle
+    loadChatList(); 
 });
-
-// Kaydedilen Sohbeti Silme
 function deleteSavedChat(chatId) {
     let savedChats = JSON.parse(localStorage.getItem('savedChats')) || [];
     savedChats = savedChats.filter(chat => chat.id !== chatId);
@@ -267,7 +244,6 @@ function deleteSavedChat(chatId) {
     showNotification('Sohbet başarıyla silindi!');
 }
 
-// Mesajları Temizleme
 function clearMessages() {
     const chatMessages = document.querySelector('.chat-messages');
     chatMessages.innerHTML = '';
@@ -288,16 +264,15 @@ function loadChatList() {
         }
 
         const chatList = document.querySelector('.chat-list');
-        chatList.innerHTML = ''; // Mevcut listeyi temizle
+        chatList.innerHTML = ''; 
 
-        // Yeni sohbet butonunu ekle
         const newChatButton = document.createElement('button');
         newChatButton.className = 'new-chat-btn';
         newChatButton.textContent = '+ Yeni Sohbet';
         newChatButton.onclick = startNewChat;
         chatList.appendChild(newChatButton);
 
-        // Hedeflerim butonunu ekle
+
         const goalsButton = document.createElement('button');
         goalsButton.className = 'goals-btn';
         goalsButton.innerHTML = `
@@ -307,19 +282,16 @@ function loadChatList() {
         goalsButton.onclick = showGoals;
         chatList.appendChild(goalsButton);
 
-        // Sohbet listesini ekle
         data.forEach(chat => {
             const chatItem = document.createElement('div');
             chatItem.className = 'chat-item';
-            chatItem.dataset.chatId = chat.id; // Chat ID'sini kaydet
+            chatItem.dataset.chatId = chat.id;
 
-            // Ana sohbet içeriği için div
             const chatContent = document.createElement('div');
             chatContent.className = 'chat-content';
             chatContent.innerHTML = `<span>${chat.name}</span>`;
             chatContent.onclick = () => loadChat(chat.id);
 
-            // Detay butonu için ayrı div
             const detailButton = document.createElement('button');
             detailButton.className = 'detay-btn';
             detailButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
@@ -333,7 +305,6 @@ function loadChatList() {
             chatList.appendChild(chatItem);
         });
 
-        // Menü container'ı oluştur (tek bir floating menü)
         if (!document.querySelector('.floating-menu')) {
             const menuContainer = document.createElement('div');
             menuContainer.className = 'floating-menu';
@@ -345,21 +316,19 @@ function loadChatList() {
             `;
             document.body.appendChild(menuContainer);
 
-            // "Düzenle" butonuna tıklama olayı ekle
             const editButton = menuContainer.querySelector('.edit-btn');
             editButton.addEventListener('click', () => {
-                const chatId = menuContainer.dataset.chatId; // Menüdeki chatId'yi al
+                const chatId = menuContainer.dataset.chatId; 
                 if (chatId) {
-                    editChatName(chatId); // Sohbet adını düzenle
+                    editChatName(chatId); 
                 }
             });
 
-            // "Sil" butonuna tıklama olayı ekle
             const deleteButton = menuContainer.querySelector('.delete-btn');
             deleteButton.addEventListener('click', () => {
-                const chatId = menuContainer.dataset.chatId; // Menüdeki chatId'yi al
+                const chatId = menuContainer.dataset.chatId; 
                 if (chatId) {
-                    deleteChatConfirm(chatId); // Sohbeti sil
+                    deleteChatConfirm(chatId); 
                 }
             });
         }
@@ -373,9 +342,9 @@ function loadChatList() {
 function showGoals() {
     const goalsPage = document.getElementById('goalsPage');
     if (goalsPage.style.display === 'none' || goalsPage.style.display === '') {
-        goalsPage.style.display = 'block'; // Hedeflerim sayfasını göster
+        goalsPage.style.display = 'block'; 
     } else {
-        goalsPage.style.display = 'none'; // Hedeflerim sayfasını gizle
+        goalsPage.style.display = 'none'; 
     }
 }
 
@@ -385,7 +354,6 @@ function toggleChatMenu(chatId) {
     const button = event.target;
     const buttonRect = button.getBoundingClientRect();
 
-    // Menü görünür durumdaysa ve aynı sohbet için tıklandıysa, menüyü kapat
     if (menu.classList.contains('active') && menu.dataset.chatId === chatId.toString()) {
         menu.classList.remove('active');
         menuContent.classList.remove('show');
@@ -395,14 +363,12 @@ function toggleChatMenu(chatId) {
         return;
     }
 
-    // Menüyü konumlandır
     menu.style.position = 'fixed';
     menu.style.top = `${buttonRect.bottom + 5}px`;
     menu.style.left = `${buttonRect.left + 20}px`;
     menu.style.display = 'block';
-    menu.dataset.chatId = chatId; // Chat ID'sini kaydet
+    menu.dataset.chatId = chatId;
 
-    // Animasyon için timeout kullan
     requestAnimationFrame(() => {
         menu.classList.add('active');
         menuContent.classList.add('show');
@@ -411,13 +377,12 @@ function toggleChatMenu(chatId) {
 
 
 function editChatName(chatId) {
-    // Input validation
+
     if (!chatId || typeof chatId !== 'string') {
         showNotification('Geçersiz sohbet ID', 'error');
         return;
     }
 
-    // Escape special characters in chatId for querySelector
     const escapedChatId = CSS.escape(chatId);
     const chatItem = document.querySelector(`.chat-item[data-chat-id="${escapedChatId}"]`);
     if (!chatItem) {
@@ -433,12 +398,10 @@ function editChatName(chatId) {
 
     const currentName = nameSpan.textContent.trim();
 
-    // Check if already editing
     if (chatItem.querySelector('.edit-name-container')) {
-        return; // Prevent multiple edit fields
+        return; 
     }
 
-    // Create edit interface
     const inputContainer = document.createElement('div');
     inputContainer.className = 'edit-name-container';
 
@@ -446,7 +409,7 @@ function editChatName(chatId) {
     input.type = 'text';
     input.value = currentName;
     input.className = 'edit-name-input';
-    input.maxLength = 100; // Prevent extremely long names
+    input.maxLength = 100; 
 
     const saveButton = document.createElement('button');
     saveButton.innerHTML = '<i class="fas fa-check"></i>';
@@ -460,7 +423,6 @@ function editChatName(chatId) {
 
     inputContainer.append(input, saveButton, cancelButton);
 
-    // Save function
     const saveChanges = async () => {
         const newName = input.value.trim();
         if (!newName) {
@@ -490,7 +452,6 @@ function editChatName(chatId) {
             inputContainer.remove();
             showNotification('Sohbet adı güncellendi', 'success');
 
-            // Close any open menus
             document.querySelectorAll('.floating-menu').forEach(menu => {
                 menu.style.display = 'none';
             });
@@ -501,7 +462,6 @@ function editChatName(chatId) {
         }
     };
 
-    // Event handlers
     const cleanup = () => {
         nameSpan.style.display = '';
         inputContainer.remove();
@@ -526,13 +486,11 @@ function editChatName(chatId) {
         }
     });
 
-    // Setup edit interface
     nameSpan.style.display = 'none';
     chatItem.querySelector('.chat-content').appendChild(inputContainer);
     input.focus();
     input.select();
 
-    // Add click outside handler with delay
     setTimeout(() => {
         document.addEventListener('click', handleClickOutside);
     }, 100);
@@ -589,19 +547,17 @@ style.textContent = `
 }
 `;
 
-// Remove any existing style element
 const existingStyle = document.querySelector('style[data-chat-editor-style]');
 if (existingStyle) {
     existingStyle.remove();
 }
 
-// Add new style element with identifier
 style.setAttribute('data-chat-editor-style', '');
 document.head.appendChild(style);
 
 }
 
-let isConfirmationShown = false; // Onay kutusunun gösterilip gösterilmediğini kontrol etmek için
+let isConfirmationShown = false; 
 
 function deleteChatConfirm(chatId) {
     if (!chatId) {
@@ -609,28 +565,24 @@ function deleteChatConfirm(chatId) {
         return;
     }
 
-    // Eğer onay kutusu daha önce gösterildiyse, tekrar gösterme
     if (isConfirmationShown) {
         return;
     }
 
-    // Kullanıcıya onay kutusu göster
     const confirmation = confirm('Bu sohbeti silmek istediğinize emin misiniz?');
     
     if (confirmation) {
-        isConfirmationShown = true; // Onay kutusunun gösterildiğini işaretle
+        isConfirmationShown = true; 
 
-        // API'ye silme isteği gönder
         fetch(`/api/chat/${chatId}/delete`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include' // Oturum bilgilerini göndermek için
+            credentials: 'include'
         })
         .then(response => {
             if (!response.ok) {
-                // Eğer yanıt başarısızsa, hatayı yakala
                 return response.json().then(err => {
                     throw new Error(err.error || 'Sohbet silinirken bir hata oluştu.');
                 });
@@ -638,7 +590,6 @@ function deleteChatConfirm(chatId) {
             return response.json();
         })
         .then(data => {
-            // UI'dan sohbeti kaldır
             const chatItem = document.querySelector(`.chat-item[data-chat-id="${chatId}"]`);
             if (chatItem) {
                 chatItem.remove();
@@ -646,13 +597,11 @@ function deleteChatConfirm(chatId) {
             
             showNotification('Sohbet başarıyla silindi', 'success');
 
-            // Eğer silinen sohbet aktif sohbetse, mesajları temizle
             if (currentChatId === chatId) {
                 clearMessages();
                 currentChatId = null;
             }
 
-            // Chat listesini yeniden yükle
             loadChatList();
         })
         .catch(error => {
@@ -660,19 +609,17 @@ function deleteChatConfirm(chatId) {
             showNotification(error.message || 'Sohbet silinirken bir hata oluştu', 'error');
         })
         .finally(() => {
-            isConfirmationShown = false; // İşlem tamamlandıktan sonra bayrağı sıfırla
+            isConfirmationShown = false; 
         });
     }
 }
 
 
-// Menü event listener'ları
 function setupMenuListeners() {
     document.addEventListener('click', (e) => {
         const menu = document.querySelector('.floating-menu');
         const menuContent = menu?.querySelector('.menu-content');
         
-        // Edit butonu tıklaması
         if (e.target.closest('.edit-btn')) {
             const chatId = menu.dataset.chatId;
             if (chatId) {
@@ -681,7 +628,6 @@ function setupMenuListeners() {
             }
         }
         
-        // Delete butonu tıklaması
         if (e.target.closest('.delete-btn')) {
             const chatId = menu.dataset.chatId;
             if (chatId) {
@@ -692,13 +638,12 @@ function setupMenuListeners() {
     });
 }
 
-// Sayfa yüklendiğinde menü işlemlerini başlat
 document.addEventListener('DOMContentLoaded', setupMenuListeners);
 
 function createChatItem(chat) {
     const chatItem = document.createElement('div');
     chatItem.className = 'chat-item';
-    chatItem.dataset.chatId = chat.id; // data-chat-id attribute'unu ekle
+    chatItem.dataset.chatId = chat.id; 
     
     const chatContent = document.createElement('div');
     chatContent.className = 'chat-content';
@@ -727,7 +672,6 @@ function closeMenu(menu, menuContent) {
     }, 300);
 }
 
-// Sayfa herhangi bir yerine tıklandığında menüyü kapat
 document.addEventListener('click', (e) => {
     const menu = document.querySelector('.floating-menu');
     const menuContent = menu?.querySelector('.menu-content');
@@ -742,7 +686,6 @@ document.addEventListener('click', (e) => {
 function loadChat(chatId) {
     currentChatId = chatId;
 
-    // Sohbet mesajlarını yükle
     fetch(`/chat/${chatId}/messages`, {
         method: 'GET',
         headers: {
@@ -757,9 +700,8 @@ function loadChat(chatId) {
         }
 
         const chatMessages = document.querySelector('.chat-messages');
-        chatMessages.innerHTML = ''; // Mevcut mesajları temizle
+        chatMessages.innerHTML = ''; 
 
-        // Mesajları ekrana ekle
         data.forEach(msg => {
             const messageElement = document.createElement('div');
             messageElement.className = `message ${msg.role}-message`;
@@ -767,7 +709,6 @@ function loadChat(chatId) {
             chatMessages.appendChild(messageElement);
         });
 
-        // Scroll'u en alta taşı
         chatMessages.scrollTop = chatMessages.scrollHeight;
     })
     .catch(error => {
@@ -781,7 +722,6 @@ function sendMessage() {
 
     if (!message) return;
 
-    // Eğer currentChatId yoksa, yeni bir sohbet başlat
     if (!currentChatId) {
         startNewChat();
         return;
@@ -789,13 +729,11 @@ function sendMessage() {
 
     const chatMessages = document.querySelector('.chat-messages');
 
-    // Kullanıcı mesajını ekrana ekle
     const userMessageElement = document.createElement('div');
     userMessageElement.className = 'message user-message';
     userMessageElement.innerHTML = `<p>${message}</p>`;
     chatMessages.appendChild(userMessageElement);
 
-    // Mesajı API'ye gönder
     fetch(`/chat/${currentChatId}/messages`, {
         method: 'POST',
         headers: {
@@ -810,36 +748,30 @@ function sendMessage() {
             return;
         }
 
-        // AI yanıtını maddeler halinde ekrana ekle
         const aiMessageElement = document.createElement('div');
         aiMessageElement.className = 'message ai-message';
 
-        // AI yanıtını parçalara ayır (her satır bir madde)
         const items = data.content.split('\n').filter(item => item.trim() !== '');
 
-        // Liste oluştur
         const list = document.createElement('ul');
         items.forEach(item => {
             const listItem = document.createElement('li');
-            listItem.textContent = item.trim(); // Maddeyi ekle
+            listItem.textContent = item.trim(); 
             list.appendChild(listItem);
         });
 
-        // Listeyi AI mesajına ekle
         aiMessageElement.appendChild(list);
         chatMessages.appendChild(aiMessageElement);
 
-        // Scroll'u en alta taşı
         chatMessages.scrollTop = chatMessages.scrollHeight;
     })
     .catch(error => {
         console.error('Hata:', error);
     });
 
-    // Input alanını temizle
     chatInput.value = '';
 }
-// Mesaj Ekleme
+
 function addMessage(type, content) {
     const chat = state.chats.find(c => c.id === state.currentChatId);
     if (!chat) return;
@@ -856,19 +788,15 @@ function addMessage(type, content) {
 }
 
 function handleKeyDown(event) {
-    // Eğer Shift + Enter kombinasyonu kullanılırsa, yeni bir satır ekle
     if (event.key === 'Enter' && event.shiftKey) {
-        return; // Varsayılan davranışı koru
+        return;
     }
 
-    // Sadece Enter tuşuna basıldığında mesaj gönder
     if (event.key === 'Enter') {
-        event.preventDefault(); // Enter tuşunun varsayılan davranışını engelle
-        sendMessage(); // Mesaj gönderme fonksiyonunu çağır
+        event.preventDefault(); 
+        sendMessage();
     }
 }
-
-// Mesaj Render Etme
 function renderMessage(message) {
     const messagesContainer = document.querySelector('.chat-messages');
     const messageDiv = document.createElement('div');
@@ -888,8 +816,8 @@ ${message.content}
 }
 
 function autoResizeTextarea(textarea) {
-    textarea.style.height = 'auto';  // Önce mevcut yüksekliği sıfırlar
-    textarea.style.height = (textarea.scrollHeight) + 'px';  // İçeriğe göre yeniden ayarlar
+    textarea.style.height = 'auto';  
+    textarea.style.height = (textarea.scrollHeight) + 'px'; 
 }
 
 
@@ -899,8 +827,7 @@ chatInput.addEventListener('input', function () {
     chatInput.style.height = chatInput.scrollHeight + 'px';
 });
 
-//Sohbet Oluşturma
-let currentChatId = null; // Mevcut sohbetin ID'sini saklamak için global bir değişken
+let currentChatId = null; 
 
 function startNewChat() {
     fetch('/chat/new', {
@@ -916,13 +843,10 @@ function startNewChat() {
             return;
         }
 
-        // Yeni sohbetin ID'sini güncelle
         currentChatId = data.chat_id;
 
-        // Sohbet listesini yeniden yükle
         loadChatList();
 
-        // Chat alanını temizle
         const chatMessages = document.querySelector('.chat-messages');
         chatMessages.innerHTML = '';
 
@@ -947,7 +871,6 @@ function toggleVoiceInput() {
 }
 
 
-// Ses Tanıma Başlatma
 function initializeVoiceRecognition() {
     if ('webkitSpeechRecognition' in window) {
         state.recognition = new webkitSpeechRecognition();
@@ -966,24 +889,21 @@ function initializeVoiceRecognition() {
 
 
 function toggleOptionsMenu(event, chatId) {
-    event.stopPropagation(); // Tıklamayı sohbet yükleme olayından ayır
+    event.stopPropagation(); 
     const optionsMenu = event.target.closest('.chat-item').querySelector('.options-menu');
     const allMenus = document.querySelectorAll('.options-menu');
 
-    // Diğer açık menüleri kapat
     allMenus.forEach(menu => {
         if (menu !== optionsMenu) {
             menu.classList.remove('active');
         }
     });
 
-    // Bu menüyü aç/kapat
     optionsMenu.classList.toggle('active');
 }
 
 
 
-// Sayfanın herhangi bir yerine tıklandığında menüyü kapat
 document.addEventListener('click', () => {
     const allMenus = document.querySelectorAll('.options-menu');
     allMenus.forEach(menu => menu.classList.remove('active'));
@@ -991,23 +911,19 @@ document.addEventListener('click', () => {
 
 function attachFile() {
     try {
-        // Input elementi oluştur
         const input = document.createElement('input');
         input.type = 'file';
 
-        // Dosya seçim değişikliğini dinle
         input.addEventListener('change', function (e) {
             const file = e.target.files[0];
 
             if (file) {
-                // Dosya boyutu kontrolü (20MB)
                 const maxSize = 20 * 1024 * 1024;
                 if (file.size > maxSize) {
                     showNotification('Dosya boyutu 20MB\'dan küçük olmalıdır!', 'error');
                     return;
                 }
 
-                // Dosya türüne göre işlem yap
                 if (file.type.startsWith('image/')) {
                     handleImageFile(file);
                 } else if (file.type.startsWith('video/')) {
@@ -1017,11 +933,9 @@ function attachFile() {
                 }
             }
 
-            // Input'u temizle
             input.value = '';
         });
 
-        // Dosya seçim penceresini aç
         input.click();
 
     } catch (error) {
@@ -1030,7 +944,6 @@ function attachFile() {
     }
 }
 
-// Resim dosyalarını işle
 function handleImageFile(file) {
     const reader = new FileReader();
 
@@ -1052,7 +965,6 @@ function handleImageFile(file) {
     reader.readAsDataURL(file);
 }
 
-// Video dosyalarını işle
 function handleVideoFile(file) {
     const reader = new FileReader();
 
@@ -1077,9 +989,8 @@ function handleVideoFile(file) {
     reader.readAsDataURL(file);
 }
 
-// Diğer dosya türlerini işle
 function handleOtherFile(file) {
-    // Dosya tipine göre icon seç
+   
     const fileIcon = getFileIcon(file.type);
 
     const fileContent = `
@@ -1098,7 +1009,6 @@ function handleOtherFile(file) {
     showNotification('Dosya başarıyla yüklendi!', 'success');
 }
 
-// Dosya boyutunu formatla
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
 
@@ -1109,7 +1019,6 @@ function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-// Dosya tipine göre icon seç
 function getFileIcon(fileType) {
     if (fileType.includes('pdf')) return 'fas fa-file-pdf';
     if (fileType.includes('word') || fileType.includes('document')) return 'fas fa-file-word';
@@ -1123,27 +1032,27 @@ function getFileIcon(fileType) {
 
 
 function saveEdit(chatId, input, titleElement) {
-    // Yeni başlığı al
+ 
     const newTitle = input.value.trim();
 
-    // Eğer başlık boşsa eski başlığa geri dön
+   
     if (newTitle === '') {
         input.remove();
         titleElement.style.display = 'block';
         return;
     }
 
-    // State'i güncelle
+ 
     const chat = state.chats.find(c => c.id === chatId);
     if (chat) {
         chat.title = newTitle;
     }
 
-    // HTML'deki başlığı güncelle
+   
     titleElement.textContent = newTitle;
     titleElement.style.display = 'block';
 
-    // Input'u kaldır
+
     input.remove();
 }
 
@@ -1168,34 +1077,29 @@ function toggleSettings() {
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
 
-    // Tema tercihini localStorage'a kaydet
     const isDarkMode = document.body.classList.contains('dark-mode');
     localStorage.setItem('darkMode', isDarkMode);
 
-    // Tema iconunu güncelle
     const themeButton = document.querySelector('.action-btn i');
     themeButton.classList.toggle('fa-moon');
     themeButton.classList.toggle('fa-sun');
 }
 
-// Sayfa yüklendiğinde tema tercihini kontrol et
 function checkThemePreference() {
     const savedDarkMode = localStorage.getItem('darkMode');
 
     if (savedDarkMode === 'true') {
         document.body.classList.add('dark-mode');
 
-        // Icon'u güncelle
+        
         const themeButton = document.querySelector('.action-btn i');
         themeButton.classList.remove('fa-moon');
         themeButton.classList.add('fa-sun');
     }
 }
 
-// Sayfa yüklendiğinde tema tercihini kontrol et
 document.addEventListener('DOMContentLoaded', checkThemePreference);
 
-// Sayfa Uyarısı
 function clearMessages() {
     const chatMessages = document.querySelector('.chat-messages');
     chatMessages.innerHTML = `
@@ -1207,23 +1111,21 @@ function clearMessages() {
     `;
 }
 
-// Sayfa Yüklendiğinde dark mode'u kontrol et
 document.addEventListener('DOMContentLoaded', () => {
     if (state.darkMode) {
         document.body.classList.add('dark');
     }
-    clearMessages(); // Hoş geldiniz mesajını göster
+    clearMessages(); 
 });
 
 
-// Sayfa sidebar menüsünü açma/kapatma
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
     const menuIcon = document.querySelector('.menu-btn i');
 
     sidebar.classList.toggle('collapsed');
 
-    // Menü ikonunu değiştir (kapalıyken bars, açıkken times)
+    
     if (sidebar.classList.contains('collapsed')) {
         menuIcon.classList.remove('fa-times');
         menuIcon.classList.add('fa-bars');
@@ -1296,7 +1198,7 @@ function applySettings() {
         large: '18px'
     }[settingsState.fontSize];
 
-    // Auto read
+   
     state.isAutoReadActive = settingsState.autoRead;
 }
 
@@ -1307,11 +1209,9 @@ window.onclick = function (event) {
     }
 }
 
-// Initialize settings when page loads
 document.addEventListener('DOMContentLoaded', loadSettings);
 
 
-// Sohbeti silme fonksiyonu
 function deleteChatConfirmed(chatId) {
     fetch(`/chat/${chatId}/delete`, {
         method: 'POST',
@@ -1322,31 +1222,29 @@ function deleteChatConfirmed(chatId) {
             console.error(data.error);
             return;
         }
-        loadChatList(); // Sohbet listesini yeniden yükle
+        loadChatList(); 
     })
     .catch(error => {
         console.error('Hata:', error);
     });
 }
 
- // Sayfa yüklendiğinde önerilen soruları göster
  document.addEventListener('DOMContentLoaded', () => {
     addSuggestedQuestions();
 });
 
-// Önerilen soruları ekleyen fonksiyon
 function addSuggestedQuestions() {
-    // Eğer zaten önerilen sorular varsa, kaldır (tekrar tekrar eklememek için)
+    
     const existingSuggestions = document.querySelector('.suggested-questions');
     if (existingSuggestions) {
         existingSuggestions.remove();
     }
 
-    // Önerilen sorular için container oluştur
+    
     const suggestionsContainer = document.createElement('div');
     suggestionsContainer.className = 'suggested-questions';
 
-    // Örnek sorular
+   
     const questions = [
         'Html Öğrenme?',
         'Python Öğrenme?', 
@@ -1354,35 +1252,28 @@ function addSuggestedQuestions() {
         'Kas Kütlesi Kazanma?'
     ];
 
-    // Her soru için bir buton oluştur
     questions.forEach(question => {
         const button = document.createElement('button');
         button.className = 'suggested-question-btn';
-        button.textContent = question; // Kullanıcıya gösterilen metin
+        button.textContent = question;  
 
-        // AI için gizli mesaj ekle
-        const hiddenMessage = "10 adımda "; // Kullanıcıya gösterilmeyen mesaj
+        const hiddenMessage = "10 adımda "; 
 
-        // Butona tıklandığında arka planda AI ile iletişim kur
         button.addEventListener('click', () => {
-            const input = document.querySelector('.input-field'); // textarea veya input
-            input.value = question; // Kullanıcıya sadece soruyu göster
-            input.focus(); // Odaklan
+            const input = document.querySelector('.input-field'); 
+            input.value = question; 
+            input.focus(); 
 
-            // Arka planda AI'ya gizli mesajı gönder
             sendMessageToAI(hiddenMessage + question);
         });
 
         suggestionsContainer.appendChild(button);
     });
 
-    // Önerilen soruları input-area div'inin içine ekle
     const inputArea = document.querySelector('.input-area');
-    inputArea.prepend(suggestionsContainer); // prepend ile en üste ekler
+    inputArea.prepend(suggestionsContainer); 
 }
 
-// Arka planda AI'ya mesaj gönderme fonksiyonu
-// AI'dan gelen yanıtı maddelere ayır ve ekranda göster
 function formatTextWithHeadings(text) {
     return text.replace(/\*\*(.*?)\*\*/g, '<span class="heading">$1</span>');
 }
@@ -1405,26 +1296,21 @@ function formatAIResponse(response) {
 function displayAIResponse(response) {
     const chatMessages = document.querySelector('.chat-messages');
 
-    // AI yanıtını maddeler halinde ekrana ekle
     const aiMessageElement = document.createElement('div');
     aiMessageElement.className = 'message ai-message';
 
-    // Yanıtı 10 maddeye tamamla
     const items = formatAIResponse(response);
 
-    // Liste oluştur
-    const list = document.createElement('ol'); // Sıralı liste (1. 2. 3. ...)
+    const list = document.createElement('ol'); 
     items.forEach(item => {
         const listItem = document.createElement('li');
-        listItem.innerHTML = formatTextWithBold(item.trim()); // Metni formatla ve ekle
+        listItem.innerHTML = formatTextWithBold(item.trim()); 
         list.appendChild(listItem);
     });
 
-    // Listeyi AI mesajına ekle
     aiMessageElement.appendChild(list);
     chatMessages.appendChild(aiMessageElement);
 
-    // Scroll'u en alta taşı
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
@@ -1439,7 +1325,7 @@ async function sendMessageToAI(message, chatId) {
         });
         const data = await response.json();
         console.log('AI Response:', data);
-        displayAIResponse(data.content); // Dönen verideki "content" alanını kullanın
+        displayAIResponse(data.content); 
     } catch (error) {
         console.error('API Error:', error);
     }
@@ -1447,38 +1333,31 @@ async function sendMessageToAI(message, chatId) {
 
 
 
-// Gönder butonuna tıklama olayını ekle
 document.querySelector('.send-button').addEventListener('click', sendMessage);
 
-// Enter tuşuna basıldığında mesaj gönderme
 document.querySelector('.input-field').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
         sendMessage();
     }
 });
 
-// Hedefler için veri modeli
 let goals = JSON.parse(localStorage.getItem('goals')) || [];
 
-// Hedeflerim sayfasını gösterme
 function showGoals() {
     const goalsPage = document.getElementById('goalsPage');
     goalsPage.classList.add('active');
     renderGoals();
 }
-
-// Hedeflerim sayfasını gizleme
 function hideGoals() {
     const goalsPage = document.getElementById('goalsPage');
     goalsPage.classList.remove('active');
 }
 
-// Hedefleri render etme
 function renderGoals() {
     const goalsList = document.getElementById('goalsList');
     const noGoalsMessage = document.getElementById('noGoalsMessage');
     
-    // Hedef listesini temizle
+ 
     goalsList.innerHTML = '';
     
     if (goals.length === 0) {
@@ -1488,9 +1367,8 @@ function renderGoals() {
     
     noGoalsMessage.style.display = 'none';
     
-    // Hedefleri render et
     goals.forEach((goal, goalIndex) => {
-        // Tamamlanan adımların sayısını hesapla
+      
         const completedSteps = goal.steps.filter(step => step.completed).length;
         const progress = goal.steps.length > 0 ? Math.round((completedSteps / goal.steps.length) * 100) : 0;
         
@@ -1526,20 +1404,17 @@ function renderGoals() {
     });
 }
 
-// Hedef adımlarını göster/gizle
 function toggleGoalSteps(goalIndex) {
     const goalSteps = document.getElementById(`goalSteps-${goalIndex}`);
     goalSteps.classList.toggle('active');
 }
 
-// Adım tamamlama durumunu değiştir
 function toggleStepCompletion(goalIndex, stepIndex) {
     goals[goalIndex].steps[stepIndex].completed = !goals[goalIndex].steps[stepIndex].completed;
     saveGoals();
     renderGoals();
 }
 
-// Yeni hedef ekleme formunu göster
 function addNewGoal() {
     const modal = document.createElement('div');
     modal.className = 'add-goal-modal active';
@@ -1578,7 +1453,6 @@ function addNewGoal() {
     document.body.appendChild(modal);
 }
 
-// Adım input alanı ekle
 function addStepInput() {
     const stepsContainer = document.getElementById('stepsContainer');
     const stepCount = stepsContainer.children.length + 1;
@@ -1595,21 +1469,18 @@ function addStepInput() {
     stepsContainer.appendChild(stepGroup);
 }
 
-// Adım input alanını kaldır
 function removeStepInput(button) {
     const stepGroup = button.parentElement;
     const stepsContainer = stepGroup.parentElement;
     
     stepsContainer.removeChild(stepGroup);
     
-    // Adım numaralarını güncelle
     const stepInputs = stepsContainer.querySelectorAll('.step-input');
     stepInputs.forEach((input, index) => {
         input.placeholder = `Adım ${index + 1}`;
     });
 }
 
-// Hedef ekleme modalını kapat
 function closeAddGoalModal() {
     const modal = document.querySelector('.add-goal-modal');
     if (modal) {
@@ -1617,7 +1488,6 @@ function closeAddGoalModal() {
     }
 }
 
-// Yeni hedefi kaydet
 function saveNewGoal() {
     const titleInput = document.getElementById('goalTitle');
     const stepInputs = document.querySelectorAll('.step-input');
@@ -1644,7 +1514,7 @@ function saveNewGoal() {
         return;
     }
     
-    // Yeni hedefi oluştur
+   
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()}`;
     
@@ -1652,7 +1522,7 @@ function saveNewGoal() {
         title,
         steps,
         date: formattedDate,
-        chatId: currentChatId || null // Eğer aktif bir sohbet varsa, onun ID'sini ekle
+        chatId: currentChatId || null 
     };
     
     goals.push(newGoal);
@@ -1661,12 +1531,10 @@ function saveNewGoal() {
     closeAddGoalModal();
 }
 
-// Hedefleri kaydet
 function saveGoals() {
     localStorage.setItem('goals', JSON.stringify(goals));
 }
 
-// Sohbette belirlenen hedefi Hedeflerim'e ekle
 function addGoalFromChat(title, steps) {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()}`;
@@ -1686,18 +1554,15 @@ function addGoalFromChat(title, steps) {
     goals.push(newGoal);
     saveGoals();
     
-    // Bildirim göster
+
     showNotification('Hedef başarıyla eklendi!', 'info');
 }
 
-// Sohbet içinde "10 adım" ifadesini içeren mesajları dinleyip hedef olarak kaydetmek için
-// Bu fonksiyon, AI yanıtını işledikten sonra çağrılmalıdır
 function checkForGoals(aiMessage) {
-    // "10 adım" içeren mesajları kontrol et
+  
     if (aiMessage.toLowerCase().includes("10 adım")) {
         const lines = aiMessage.split('\n');
-        
-        // Başlık olabilecek satırı bul (genellikle ilk satır veya "10 adım" içeren satır)
+
         let title = "";
         let titleIndex = -1;
         
@@ -1714,7 +1579,6 @@ function checkForGoals(aiMessage) {
             titleIndex = 0;
         }
         
-        // Adımları topla (1., 2., vb. ile başlayan satırlar)
         const steps = [];
         const stepRegex = /^\s*(\d+)[.)]\s+(.+)$/;
         
@@ -1725,9 +1589,8 @@ function checkForGoals(aiMessage) {
             }
         }
         
-        // Eğer 10 adım bulunduysa hedefi ekle
         if (steps.length > 0) {
-            // Kullanıcıya sor
+           
             if (confirm(`"${title}" hedefini Hedeflerim sayfasına eklemek ister misiniz?`)) {
                 addGoalFromChat(title, steps);
             }
@@ -1735,18 +1598,12 @@ function checkForGoals(aiMessage) {
     }
 }
 
-// Mevcut sohbet fonksiyonlarına entegrasyon
-// sendMessage fonksiyonuna eklenecek parça:
 function addGoalDetectionToChat() {
-    // Orjinal sendMessage fonksiyonunu sakla
     const originalSendMessage = window.sendMessage;
     
-    // sendMessage fonksiyonunu yeniden tanımla
-    window.sendMessage = function() {
-        // Orjinal fonksiyonu çağır
+     window.sendMessage = function() {
         originalSendMessage.apply(this, arguments);
         
-        // AI yanıtını kontrol etmek için son mesaja bir gözlemci ekle
         setTimeout(() => {
             const chatMessages = document.querySelector('.chat-messages');
             const lastAIMessage = chatMessages.querySelector('.message.ai-message:last-child');
@@ -1754,16 +1611,12 @@ function addGoalDetectionToChat() {
             if (lastAIMessage) {
                 checkForGoals(lastAIMessage.textContent);
             }
-        }, 1000); // AI'ın yanıt vermesi için biraz bekle
+        }, 1000);
     };
 }
-
-// Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', function() {
-    // Hedeflerim işlevselliğini başlat
     addGoalDetectionToChat();
     
-    // Mevcut sohbetlere Hedeflerim butonunu ekle
     const chatList = document.querySelector('.chat-list');
     const newChatBtn = chatList.querySelector('.new-chat-btn');
     
@@ -1774,7 +1627,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chatList.insertBefore(goalsBtn, newChatBtn.nextSibling);
     
-    // Hedeflerim sayfasını oluştur
     const goalsPage = document.createElement('div');
     goalsPage.id = 'goalsPage';
     goalsPage.className = 'goals-page';
@@ -1809,7 +1661,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(goalsPage);
 });
 
-// Bildirim gösterme fonksiyonu
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -1822,12 +1673,11 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Animasyon ekle
+    
     setTimeout(() => {
         notification.classList.add('show');
     }, 10);
     
-    // Bildirimi kaldır
     setTimeout(() => {
         notification.classList.remove('show');
         setTimeout(() => {
@@ -1836,7 +1686,6 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// CSS için ek bildirim stilleri
 const notificationStyles = `
 .notification {
     position: fixed;
@@ -1906,7 +1755,6 @@ body.dark-mode .notification {
 }
 `;
 
-// Stil ekle
 document.addEventListener('DOMContentLoaded', function() {
     const style = document.createElement('style');
     style.textContent = notificationStyles;
@@ -1914,13 +1762,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Yapay zeka yanıtını analiz edip hedefi kaydetme
 function saveGoalFromAIMessage(aiMessage) {
-    // "10 adım" içeren mesajları kontrol et
     if (aiMessage.toLowerCase().includes("10 adım")) {
         const lines = aiMessage.split('\n');
         
-        // Başlık olabilecek satırı bul (genellikle ilk satır veya "10 adım" içeren satır)
+      
         let title = "";
         let titleIndex = -1;
         
@@ -1937,7 +1783,6 @@ function saveGoalFromAIMessage(aiMessage) {
             titleIndex = 0;
         }
         
-        // Adımları topla (1., 2., vb. ile başlayan satırlar)
         const steps = [];
         const stepRegex = /^\s*(\d+)[.)]\s+(.+)$/;
         
@@ -1948,9 +1793,7 @@ function saveGoalFromAIMessage(aiMessage) {
             }
         }
         
-        // Eğer 10 adım bulunduysa hedefi ekle
         if (steps.length > 0) {
-            // Kullanıcıya sor
             if (confirm(`"${title}" hedefini Hedeflerim sayfasına eklemek ister misiniz?`)) {
                 addGoalFromChat(title, steps);
             }
@@ -1958,7 +1801,6 @@ function saveGoalFromAIMessage(aiMessage) {
     }
 }
 
-// Hedefi Hedeflerim sayfasına ekle
 function addGoalFromChat(title, steps) {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}.${currentDate.getMonth() + 1}.${currentDate.getFullYear()}`;
@@ -1979,6 +1821,5 @@ function addGoalFromChat(title, steps) {
     saveGoals();
     renderGoals();
     
-    // Bildirim göster
     showNotification('Hedef başarıyla eklendi!', 'info');
 }

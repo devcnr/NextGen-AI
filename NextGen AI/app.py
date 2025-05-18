@@ -14,7 +14,7 @@ app.config["SECRET_KEY"] = "secret_key"
 
 db = SQLAlchemy(app)
 
-API_KEY = 'AIzaSyBlKEoDxphwzhbHnKu8fpXoOhyePRpemTw'
+API_KEY = ''
 API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={API_KEY}'
 
 headers = {
@@ -107,12 +107,12 @@ def chat_messages(chat_id):
     if not user_message:
         return jsonify({"error": "Boş mesaj gönderilemez."}), 400
 
-    # Kullanıcı mesajını kaydet
+
     new_message = Message(role="user", content=user_message, chat_id=chat_id)
     db.session.add(new_message)
     db.session.commit()
 
-    # Sohbet geçmişini oluştur
+
     conversation_history = [
         {
             "role": "user" if msg.role == "user" else "model",
@@ -120,7 +120,7 @@ def chat_messages(chat_id):
         } for msg in chat.messages
     ]
 
-    # API isteği için doğru format
+
     api_request = {
         "contents": [{
             "role": "user",
@@ -131,7 +131,7 @@ def chat_messages(chat_id):
     try:
         response = requests.post(API_URL, headers=headers, json=api_request)
         
-        print("API Response:", response.text)  # Debug için
+        print("API Response:", response.text)  
 
         if response.status_code == 200:
             result = response.json()
@@ -173,15 +173,13 @@ def get_chats():
     if "user_id" not in session:
         return jsonify({"error": "Giriş yapmalısınız."}), 401
 
-    # Kullanıcının tüm sohbetlerini oluşturulma tarihine göre sırala
     chats = Chat.query.filter_by(user_id=session["user_id"]).order_by(Chat.created_at.asc()).all()
     
-    # Sohbetleri JSON formatında döndür
     chat_list = []
     for index, chat in enumerate(chats, start=1):
         chat_list.append({
             "id": chat.id,
-            "name": f"Sohbet {index}",  # Sohbet 1, Sohbet 2, Sohbet 3, ...
+            "name": f"Sohbet {index}", 
         })
 
     return jsonify(chat_list)
@@ -249,38 +247,36 @@ def delete_chat(chat_id):
         if not chat:
             return jsonify({"error": "Sohbet bulunamadı."}), 404
         
-        # Önce sohbete ait tüm mesajları sil
+    
         Message.query.filter_by(chat_id=chat_id).delete()
         
-        # Sonra sohbeti sil
         db.session.delete(chat)
         db.session.commit()
 
         return jsonify({"message": "Sohbet başarıyla silindi"})
     except Exception as e:
-        db.session.rollback()  # Hata durumunda işlemi geri al
+        db.session.rollback()  
         return jsonify({"error": f"Sohbet silinirken bir hata oluştu: {str(e)}"}), 500
 
 @app.route('/chat/<int:chat_id>/edit', methods=['PUT'])
 def edit_chat(chat_id):
-    # JSON verisini al
+
     data = request.get_json()
     new_name = data.get('name')
 
-    # Yeni ad boşsa hata döndür
+ 
     if not new_name:
         return jsonify({"error": "Sohbet adı boş olamaz"}), 400
 
-    # Veritabanında sohbeti bul
+  
     chat = Chat.query.filter_by(id=chat_id, user_id=session["user_id"]).first()
     if not chat:
         return jsonify({"error": "Sohbet bulunamadı"}), 404
 
-    # Sohbet adını güncelle ve veritabanına kaydet
+  
     chat.name = new_name
     db.session.commit()
 
-    # Başarılı yanıt döndür
     return jsonify({"message": "Sohbet adı güncellendi"}), 200
 
 @app.route("/chats/saved", methods=["GET"])
@@ -288,10 +284,8 @@ def get_saved_chats():
     if "user_id" not in session:
         return jsonify({"error": "Giriş yapmalısınız."}), 401
 
-    # Kullanıcının kaydedilmiş sohbetlerini al
     saved_chats = Chat.query.filter_by(user_id=session["user_id"], is_saved=True).order_by(Chat.created_at.desc()).all()
     
-    # Sohbetleri JSON formatında döndür
     return jsonify([{
         "id": chat.id,
         "name": f"Sohbet {chat.id}",  # Sohbet 1, Sohbet 2, ...
@@ -310,7 +304,6 @@ def save_chat(chat_id):
 
     return jsonify({"message": "Sohbet başarıyla kaydedildi"})
 
-# Database initialization
 with app.app_context():
     try:
         db.create_all()

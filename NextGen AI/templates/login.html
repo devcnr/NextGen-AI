@@ -325,7 +325,7 @@
         }
       }
 
-      /* Flash mesajları için stil */
+      
       .flash-messages {
         position: fixed;
         top: 20px;
@@ -457,7 +457,7 @@
             }
         }
 
-        /* Büyük ekranlar için ek düzenlemeler (1024px ve üzeri) */
+     
         @media (max-width: 1024px) {
             .main-wrapper {
                 gap: 50px;
@@ -477,7 +477,6 @@
   <body>
     <div id="particles-js"></div>
 
-    <!-- Flash mesajlarını göstermek için bir bölüm ekleyin -->
     <div class="flash-messages">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -609,7 +608,6 @@
         }
       }
 
-      // Slider animasyonu
       let currentSlide = 0;
       const slider = document.querySelector(".slider");
       const totalSlides = document.querySelectorAll(".slider img").length;
@@ -625,7 +623,6 @@
 
       setInterval(nextSlide, 5000);
 
-      // Input animasyonları
       document.querySelectorAll(".input-group input").forEach((input) => {
         input.addEventListener("focus", () => {
           input.parentElement.classList.add("focused");
@@ -638,22 +635,19 @@
         });
       });
 
-      // Flash mesajlarını otomatik olarak kaldır
-      document.addEventListener("DOMContentLoaded", function() {
+       document.addEventListener("DOMContentLoaded", function() {
         const flashMessages = document.querySelectorAll(".flash-message");
 
         flashMessages.forEach(message => {
-          // Mesajı göster
           message.style.opacity = 1;
           message.style.transform = "translateX(0)";
 
-          // 3 saniye sonra mesajı kaydır ve kaldır
-          setTimeout(() => {
+         setTimeout(() => {
             message.style.animation = "slideOut 0.5s ease-out forwards";
             setTimeout(() => {
               message.remove();
-            }, 500); // Animasyon süresi kadar bekleyip kaldır
-          }, 3000); // 3 saniye sonra kaybol
+            }, 500); 
+          }, 3000); 
         });
       });
     </script>

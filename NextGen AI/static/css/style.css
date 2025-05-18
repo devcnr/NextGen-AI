@@ -395,7 +395,6 @@ body {
     
 }
 
-/* Tablet ve küçük masaüstü */
 @media screen and (max-width: 1200px) {
     .anaIcerik {
         margin-left: 0;
@@ -417,7 +416,6 @@ body {
     }
 }
 
-/* Tablet */
 @media screen and (max-width: 992px) {
     .anaSayfa h1 {
         font-size: 3rem;
@@ -445,7 +443,6 @@ body {
     }
 }
 
-/* Büyük Telefon */
 @media screen and (max-width: 768px) {
     .menu {
         padding: 0 1rem;
@@ -505,7 +502,6 @@ body {
     }
 }
 
-/* Küçük Telefon */
 @media screen and (max-width: 480px) {
     .logo {
         font-size: 1.5rem;
