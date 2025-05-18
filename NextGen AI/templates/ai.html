@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hedefine 10 Adım</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ai.css') }}">
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <i class="fas fa-robot"></i>
+                    <span>NextGen AI</span>
+                </div>
+                <button class="action-btn" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            
+
+            <div class="chat-list"> 
+                <button class="new-chat-btn" onclick="startNewChat()">+ Yeni Sohbet</button>
+                <button class="goals-btn" onclick="showGoals()">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Hedeflerim</span>
+                </button>
+                
+            </div>
+            
+            <div id="goalsPage" class="goals-page">
+                <div class="goals-header">
+                    <h2><i class="fas fa-bullseye"></i> Hedeflerim</h2>
+                    <button class="close-btn" onclick="hideGoals()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="goals-content">
+                    <div class="no-goals-message" id="noGoalsMessage">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Henüz hedef eklenmemiş. Sohbetlerinizde belirlediğiniz hedefler burada listelenecektir.</p>
+                    </div>
+                    
+                    <ul class="goals-list" id="goalsList">
+                    </ul>
+                </div>
+                
+                <div class="goals-footer">
+                    <button class="add-goal-btn" onclick="addNewGoal()">
+                        <i class="fas fa-plus"></i> Yeni Hedef Ekle
+                    </button>
+                </div>
+            </div>
+            
+        </aside>
+
+        <main class="chat-area">
+            <div class="chat-header">
+
+                <div class="btn">
+                    <div> <button class="action-btn menu-btn" onclick="toggleSidebar()" title="Menü">
+                            <i class="fas fa-bars"></i></div>
+                    </button>
+                    <div class="settings" onclick="toggleSettings()">
+
+    <div id="settingsModal" class="settings-modal">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2><i class="fas fa-cog"></i> Ayarlar</h2>
+                <button class="close-btn" onclick="closeSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="settings-body">
+                <div class="settings-section">
+                    <h3>Genel</h3>
+                    <div class="setting-item">
+                        <span>Karanlık Mod</span>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <span>Sesli Okuma</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoReadToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Görünüm</h3>
+                    <div class="setting-item">
+                        <span>Yazı Boyutu</span>
+                        <select id="fontSizeSelect">
+                            <option value="small">Küçük</option>
+                            <option value="medium">Orta</option>
+                            <option value="large">Büyük</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Bildirimler</h3>
+                    <div class="setting-item">
+                        <span>Sesli Bildirimler</span>
+                        <label class="switch">
+                            <input type="checkbox" id="soundToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="logout-btn">
+                        <a href="logout">Çıkış Yap</a>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            <div class="settings-footer">
+                <button class="save-btn" onclick="saveSettings()">Kaydet</button>
+                <button class="cancel-btn" onclick="closeSettings()">İptal</button>
+            </div>
+        </div>
+    </div>
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+
+                <h2>AI Asistan</h2>
+                <div class="header-actions">
+                   
+                    <button class="action-btn" onclick="toggleVoiceInput()" title="Sesli Giriş">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <button class="action-btn" onclick="toggleAutoRead()" title="Sesli Okuma">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+
+            </div>
+            <div class="area">
+            <div class="input-area">
+                <div class="suggested-questions">
+                    <button class="suggested-question-btn" data-hidden-message="10 adımda"></button>
+                    <button class="suggested-question-btn" data-hidden-message="10 adımda"></button>
+                    <button class="suggested-question-btn" data-hidden-message="10 adımda"></button>
+                    <button class="suggested-question-btn" data-hidden-message="10 adımda"></button>
+                </div>
+                <div class="input-container">
+                    <div class="input-tools">
+                        <button class="action-btn" onclick="toggleEmoji()">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <button class="action-btn" onclick="attachFile()">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+
+                        
+                    </div>
+
+                    
+                    <textarea class="input-field" placeholder="Mesajınızı yazın..." rows="1"
+                        onInput="autoResizeTextarea(this)"id="chatInput" onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+
+</body>
+</html>
